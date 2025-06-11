@@ -1,29 +1,16 @@
 {
-  "short_name": "Guthinabailu Organics",
-  "name": "Guthinabailu Organics - Pure Natural Products",
+  "name": "Guthinabailu Organics",
+  "short_name": "Guthinabailu",
+  "description": "Pure organic products directly from our farms to your table",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
+      "src": "/favicon.svg",
       "sizes": "512x512",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     }
-  ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#4CAF50",
-  "background_color": "#ffffff",
-  "description": "Pure and natural organic products from Guthinabailu Organics"
+  ]
 }
