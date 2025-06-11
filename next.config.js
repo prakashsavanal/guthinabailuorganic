@@ -5,8 +5,9 @@ const nextConfig = {
     unoptimized: true, // Required for static export
   },
   trailingSlash: true, // Recommended for static exports
-  assetPrefix: './',
-  basePath: '',
+  // Remove assetPrefix and basePath as they're causing issues
+  // Add proper export configuration
+  distDir: 'out',
   // Add headers for better caching and security
   async headers() {
     return [
