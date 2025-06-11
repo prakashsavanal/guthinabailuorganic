@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle (Green) -->
+  <circle cx="256" cy="256" r="256" fill="#4CAF50"/>
+  
+  <!-- "100%" text -->
+  <text x="256" y="270" font-family="Arial, sans-serif" font-size="180" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">100%</text>
+  
+  <!-- Organic Leaf (Subtle, slightly below and to the right) -->
+  <path d="M300 350 C310 330, 320 310, 310 300 C300 290, 280 300, 290 320 L270 340 C280 360, 290 370, 300 350 Z" fill="#8BC34A"/>
+  
+  <!-- Small Earth/Globe (Subtle, slightly below and to the left) -->
+  <circle cx="210" cy="350" r="40" fill="#2196F3" opacity="0.6"/>
+  <path d="M210 310 A40 40 0 0 0 210 390 A40 40 0 0 1 210 310 Z" fill="#4CAF50" opacity="0.8"/>
+</svg> 
