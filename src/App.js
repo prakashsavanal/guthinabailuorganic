@@ -10,6 +10,8 @@ import Trust from './components/Trust';
 import WhyD2C from './components/WhyD2C';
 import Contact from './components/Contact';
 import Footer from './Footer';
+import LoginModal from './components/LoginModal';
+import SignupModal from './components/SignupModal';
 import './App.css';
 
 function App() {
@@ -26,6 +28,9 @@ function App() {
   const [showCart, setShowCart] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+  // Login/signup modal state
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false);
 
   // Section navigation
   const handleShowSection = (id) => {
@@ -33,6 +38,8 @@ function App() {
     setShowCart(false);
     setShowCheckout(false);
     setShowOrderSuccess(false);
+    setShowLogin(false);
+    setShowSignup(false);
     setTimeout(() => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -47,7 +54,7 @@ function App() {
 
   return (
     <div className="bg-stone-50 text-gray-800 min-h-screen font-[Inter,sans-serif]">
-      <Header onShowSection={handleShowSection} cartItemCount={cartItemCount} />
+      <Header onShowSection={handleShowSection} cartItemCount={cartItemCount} onShowLogin={() => setShowLogin(true)} />
       <main id="main-content">
         <Hero onShopNow={() => handleShowSection('products')} sectionRef={null} />
         <About ref={null} />
@@ -86,6 +93,22 @@ function App() {
         />
       </main>
       <Footer />
+      <LoginModal
+        isActive={showLogin}
+        onClose={() => setShowLogin(false)}
+        onShowSignup={() => {
+          setShowLogin(false);
+          setShowSignup(true);
+        }}
+      />
+      <SignupModal
+        isActive={showSignup}
+        onClose={() => setShowSignup(false)}
+        onShowLogin={() => {
+          setShowSignup(false);
+          setShowLogin(true);
+        }}
+      />
     </div>
   );
 }

@@ -5,9 +5,10 @@ import React, { useState, useEffect } from 'react';
 interface HeaderProps {
   onShowSection: (section: string) => void;
   cartItemCount: number;
+  onShowLogin: () => void;
 }
 
-export default function Header({ onShowSection, cartItemCount }: HeaderProps) {
+export default function Header({ onShowSection, cartItemCount, onShowLogin }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -60,6 +61,12 @@ export default function Header({ onShowSection, cartItemCount }: HeaderProps) {
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={onShowLogin}
+              className="text-sm font-medium text-gray-700 hover:text-green-700 transition-colors border border-green-700 rounded px-4 py-1 ml-4"
+            >
+              Login
+            </button>
           </nav>
 
           {/* Cart Button */}
@@ -135,10 +142,19 @@ export default function Header({ onShowSection, cartItemCount }: HeaderProps) {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => {
+                  onShowLogin();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-gray-700 hover:text-green-700 text-sm font-medium border border-green-700 rounded px-4 py-1"
+              >
+                Login
+              </button>
             </nav>
           </div>
         )}
       </div>
     </header>
   );
-} 
+}
