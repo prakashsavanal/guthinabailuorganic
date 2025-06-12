@@ -1,0 +1,16 @@
+{
+  "name": "Guthinabailu Organics",
+  "short_name": "Guthinabailu",
+  "description": "Pure organic products directly from our farms to your table",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

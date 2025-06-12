@@ -27,12 +27,12 @@ const products: Product[] = [
     name: 'Organic Forest Honey (500g)',
     price: 499,
     description: 'Pure, raw, and unadulterated honey from our forest-adjacent farmlands. Rich in natural enzymes.',
-    image: 'https://placehold.co/200x200/FDCB57/3B2C0A?text=Honey',
+    image: '/Honey.jpg', // updated to correct image
     images: [
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+1',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+2',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+3',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+4'
+      '/Honey.jpg',
+      '/Honey.jpg',
+      '/Honey.jpg',
+      '/Honey.jpg'
     ]
   },
   {
@@ -40,12 +40,12 @@ const products: Product[] = [
     name: 'Virgin Coconut Oil (500ml)',
     price: 349,
     description: '100% cold-pressed from fresh organic coconuts. Unrefined and pure, perfect for cooking or wellness.',
-    image: 'https://placehold.co/200x200/C1E1C1/004B00?text=VCO',
+    image: '/Virgin Coconut Oil.jpg', // updated to correct image
     images: [
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+1',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+2',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+3',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+4'
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg'
     ]
   },
   {
@@ -53,12 +53,12 @@ const products: Product[] = [
     name: 'Organic Forest Honey (1kg)',
     price: 899,
     description: 'Large pack of our signature forest honey, double the goodness for your family.',
-    image: 'https://placehold.co/200x200/FDCB57/3B2C0A?text=Honey+1KG',
+    image: '/Honey.jpg', // updated to correct image
     images: [
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+1KG+1',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+1KG+2',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+1KG+3',
-      'https://placehold.co/600x600/FDCB57/3B2C0A?text=Honey+1KG+4'
+      '/Honey.jpg',
+      '/Honey.jpg',
+      '/Honey.jpg',
+      '/Honey.jpg'
     ]
   },
   {
@@ -66,12 +66,12 @@ const products: Product[] = [
     name: 'Virgin Coconut Oil (1 Litre)',
     price: 649,
     description: 'Family-sized bottle of our cold-pressed VCO. A kitchen essential for healthy living.',
-    image: 'https://placehold.co/200x200/C1E1C1/004B00?text=VCO+1L',
+    image: '/Virgin Coconut Oil.jpg', // updated to correct image
     images: [
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+1L+1',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+1L+2',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+1L+3',
-      'https://placehold.co/600x600/C1E1C1/004B00?text=VCO+1L+4'
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg',
+      '/Virgin Coconut Oil.jpg'
     ]
   }
 ];
@@ -84,91 +84,105 @@ export default function Products({ cart, setCart, updateCartCount, onShowSection
   const [activeCategory, setActiveCategory] = useState('all');
   const [sortBy, setSortBy] = useState('default');
   const [showQuickView, setShowQuickView] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   });
 
   useEffect(() => {
-    // Simulate loading products
-    const timer = setTimeout(() => {
+    setIsClient(true);
+    try {
+      // Load wishlist from localStorage
+      const savedWishlist = localStorage.getItem('guthinabailuWishlist');
+      if (savedWishlist) {
+        setWishlist(JSON.parse(savedWishlist));
+      }
+
+      // Initialize addedToCart state based on cart items
+      const initialAddedState: { [key: string]: boolean } = {};
+      cart.forEach(item => {
+        initialAddedState[item.id] = true;
+      });
+      setItemsAdded(initialAddedState);
+
+      // Simulate loading products
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    } catch (error) {
+      console.error('Error initializing Products component:', error);
       setLoading(false);
-    }, 1000);
-
-    // Load wishlist from localStorage
-    const savedWishlist = localStorage.getItem('guthinabailuWishlist');
-    if (savedWishlist) {
-      setWishlist(JSON.parse(savedWishlist));
     }
-
-    // Initialize addedToCart state based on cart items
-    const initialAddedState: { [key: string]: boolean } = {};
-    cart.forEach(item => {
-      initialAddedState[item.id] = true;
-    });
-    setItemsAdded(initialAddedState);
-
-    return () => clearTimeout(timer);
   }, [cart]);
 
   const handleQuantityChange = (productId: string, newQuantity: number) => {
-    // Allow quantity to go to 0
-    setQuantities(prev => ({ ...prev, [productId]: newQuantity }));
-    
-    if (newQuantity === 0) {
-      // Remove item from cart when quantity becomes 0
-      const updatedCart = cart.filter(item => item.id !== productId);
-      setCart(updatedCart);
-      updateCartCount(updatedCart);
-      localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
-      setItemsAdded(prev => ({ ...prev, [productId]: false }));
-    } else {
-      // Update cart with new quantity if item exists in cart
-      const existingItem = cart.find(item => item.id === productId);
-      if (existingItem) {
-        const updatedCart = cart.map(item =>
-          item.id === productId
-            ? { ...item, quantity: newQuantity }
-            : item
-        );
+    if (!isClient) return;
+
+    try {
+      setQuantities(prev => ({ ...prev, [productId]: newQuantity }));
+      
+      if (newQuantity === 0) {
+        const updatedCart = cart.filter(item => item.id !== productId);
         setCart(updatedCart);
         updateCartCount(updatedCart);
         localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
+        setItemsAdded(prev => ({ ...prev, [productId]: false }));
+      } else {
+        const existingItem = cart.find(item => item.id === productId);
+        if (existingItem) {
+          const updatedCart = cart.map(item =>
+            item.id === productId
+              ? { ...item, quantity: newQuantity }
+              : item
+          );
+          setCart(updatedCart);
+          updateCartCount(updatedCart);
+          localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
+        }
       }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
     }
   };
 
   const addToCart = (product: Product) => {
-    const currentQuantity = quantities[product.id] || 1;
-    
-    // Only remove from cart if quantity is explicitly 0
-    if (currentQuantity === 0) {
-      const updatedCart = cart.filter(item => item.id !== product.id);
+    if (!isClient) return;
+
+    try {
+      const currentQuantity = quantities[product.id] || 1;
+      
+      if (currentQuantity === 0) {
+        const updatedCart = cart.filter(item => item.id !== product.id);
+        setCart(updatedCart);
+        updateCartCount(updatedCart);
+        localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
+        setItemsAdded(prev => ({ ...prev, [product.id]: false }));
+        return;
+      }
+
+      const existingItem = cart.find(item => item.id === product.id);
+      let updatedCart;
+
+      if (existingItem) {
+        updatedCart = cart.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: currentQuantity }
+            : item
+        );
+      } else {
+        updatedCart = [...cart, { ...product, quantity: currentQuantity }];
+      }
+
       setCart(updatedCart);
       updateCartCount(updatedCart);
       localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
-      setItemsAdded(prev => ({ ...prev, [product.id]: false }));
-      return;
+      setItemsAdded(prev => ({ ...prev, [product.id]: true }));
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
-
-    // Add or update item in cart
-    const existingItem = cart.find(item => item.id === product.id);
-    let updatedCart;
-
-    if (existingItem) {
-      updatedCart = cart.map(item =>
-        item.id === product.id
-          ? { ...item, quantity: currentQuantity }
-          : item
-      );
-    } else {
-      updatedCart = [...cart, { ...product, quantity: currentQuantity }];
-    }
-
-    setCart(updatedCart);
-    updateCartCount(updatedCart);
-    localStorage.setItem('guthinabailuCart', JSON.stringify(updatedCart));
-    setItemsAdded(prev => ({ ...prev, [product.id]: true }));
   };
 
   const handleViewCart = () => {
@@ -176,29 +190,35 @@ export default function Products({ cart, setCart, updateCartCount, onShowSection
   };
 
   const toggleWishlist = (product: Product) => {
-    const isInWishlist = wishlist.some(item => item === product.id);
-    let updatedWishlist;
+    if (!isClient) return;
 
-    if (isInWishlist) {
-      updatedWishlist = wishlist.filter(item => item !== product.id);
-    } else {
-      updatedWishlist = [...wishlist, product.id];
+    try {
+      const isInWishlist = wishlist.some(item => item === product.id);
+      let updatedWishlist;
+
+      if (isInWishlist) {
+        updatedWishlist = wishlist.filter(item => item !== product.id);
+      } else {
+        updatedWishlist = [...wishlist, product.id];
+      }
+
+      setWishlist(updatedWishlist);
+      localStorage.setItem('guthinabailuWishlist', JSON.stringify(updatedWishlist));
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
     }
-
-    setWishlist(updatedWishlist);
-    localStorage.setItem('guthinabailuWishlist', JSON.stringify(updatedWishlist));
   };
 
   const isInWishlist = (productId: string) => {
     return wishlist.some(item => item === productId);
   };
 
-  if (loading) {
+  if (!isClient || loading) {
     return (
       <section id="products" className="py-16 bg-gray-50" ref={ref}>
         <div className="container mx-auto px-6">
           <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-bounce-in text-4xl">🌿</div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           </div>
         </div>
       </section>
@@ -312,4 +332,4 @@ export default function Products({ cart, setCart, updateCartCount, onShowSection
       )}
     </section>
   );
-} 
+}

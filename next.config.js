@@ -1,13 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',  // Enable static exports
+  // output: 'export',  // Disable static exports for server rendering
   images: {
-    unoptimized: true, // Required for static export
+    // unoptimized: true, // Only needed for static export
   },
-  trailingSlash: true, // Recommended for static exports
+  // trailingSlash: true, // Only needed for static export
   // Remove assetPrefix and basePath as they're causing issues
-  // Add proper export configuration
-  distDir: 'out',
+  distDir: '.next', // Default for server rendering
   // Add headers for better caching and security
   async headers() {
     return [
@@ -24,4 +23,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig 
+module.exports = nextConfig

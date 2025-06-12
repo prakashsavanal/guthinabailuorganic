@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import About from '@/components/About';
@@ -14,6 +15,16 @@ import OrderSuccess from '@/components/OrderSuccess';
 import OrderTracking from '@/components/OrderTracking';
 import LoginModal from '@/components/LoginModal';
 import SignupModal from '@/components/SignupModal';
+
+// Dynamically import components that use browser APIs
+const DynamicProducts = dynamic(() => import('@/components/Products'), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+    </div>
+  ),
+});
 
 interface Product {
   id: string;
@@ -34,23 +45,33 @@ export default function Home() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [cart, setCart] = useState<Product[]>([]);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Load cart from localStorage
-    const savedCart = localStorage.getItem('guthinabailuCart');
-    if (savedCart) {
-      setCart(JSON.parse(savedCart));
+    setIsClient(true);
+    try {
+      // Load cart from localStorage
+      const savedCart = localStorage.getItem('guthinabailuCart');
+      if (savedCart) {
+        setCart(JSON.parse(savedCart));
+      }
+    } catch (error) {
+      console.error('Error loading cart:', error);
     }
   }, []);
 
   useEffect(() => {
-    // Save cart to localStorage
-    localStorage.setItem('guthinabailuCart', JSON.stringify(cart));
-  }, [cart]);
+    if (isClient) {
+      try {
+        // Save cart to localStorage
+        localStorage.setItem('guthinabailuCart', JSON.stringify(cart));
+      } catch (error) {
+        console.error('Error saving cart:', error);
+      }
+    }
+  }, [cart, isClient]);
 
   const updateCartCount = () => {
-    // This function is now handled internally by Products and Cart components
-    // But keeping it here for consistency if needed for other UI elements.
     return cart.reduce((count, item) => count + (item.quantity || 0), 0);
   };
 
@@ -73,8 +94,6 @@ export default function Home() {
       setIsSignupOpen(false);
     }
 
-    console.log(`Attempting to show section: ${section}`);
-
     if (section === 'cart') {
       setIsCartOpen(true);
     } else if (section === 'checkout') {
@@ -88,16 +107,11 @@ export default function Home() {
     } else if (section === 'signup') {
       setIsSignupOpen(true);
     } else if (section === 'products' || section === 'hero' || section === 'about' || section === 'trust' || section === 'why-d2c' || section === 'contact') {
-      // Only scroll if it's a section on the main page
       const targetSection = document.getElementById(section);
       if (targetSection) {
-        console.log(`Found target section: ${section}. Attempting to scroll.`);
         setTimeout(() => {
           targetSection.scrollIntoView({ behavior: 'smooth' });
-          console.log(`Scrolled to section: ${section}`);
-        }, 100); // Small delay to ensure DOM is ready
-      } else {
-        console.log(`Target section not found: ${section}`);
+        }, 100);
       }
     }
   };
@@ -111,87 +125,93 @@ export default function Home() {
     setIsSignupOpen(false);
   };
 
-  const handleLoginSuccess = () => {
-    console.log("User logged in!");
-    handleCloseModals();
-    // Potentially navigate to a dashboard or show a success message
-  };
-
-  const handleSignupSuccess = () => {
-    console.log("User signed up!");
-    handleCloseModals();
-    // Potentially navigate to a dashboard or show a success message
-  };
-
-  const handleShowLoginFromSignup = () => {
-    setIsSignupOpen(false);
+  const handleShowLogin = () => {
     setIsLoginOpen(true);
   };
 
-  const handleShowSignupFromLogin = () => {
-    setIsLoginOpen(false);
-    setIsSignupOpen(true);
-  };
+  if (!isClient) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 font-sans">
-      <Header onShowSection={handleShowSection} cartItemCount={updateCartCount()} />
-      <Hero onShowSection={handleShowSection} />
-      <About />
-      <Products
-        cart={cart}
-        setCart={handleUpdateCart}
-        updateCartCount={updateCartCount}
-        onShowSection={handleShowSection}
-      />
-      <Trust />
-      <WhyD2C />
-      <Contact />
-
-      {/* Modals */}
-      {isCartOpen && (
-        <Cart
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      }>
+        <Header 
+          onShowSection={handleShowSection} 
+          cartItemCount={updateCartCount()} 
+          onShowLogin={handleShowLogin}
+        />
+        <Hero onShowSection={handleShowSection} />
+        <About />
+        <DynamicProducts
           cart={cart}
           setCart={handleUpdateCart}
           updateCartCount={updateCartCount}
           onShowSection={handleShowSection}
-          isActive={isCartOpen}
         />
-      )}
-      {isCheckoutOpen && (
-        <Checkout
-          cart={cart}
-          onShowSection={handleShowSection}
-          onClose={handleCloseModals}
-          setCart={handleUpdateCart}
-          onOrderSuccess={() => handleShowSection('order-success')}
-          isActive={isCheckoutOpen}
-        />
-      )}
-      {isOrderSuccessOpen && (
-        <OrderSuccess
-          onShowSection={handleShowSection}
-          isActive={isOrderSuccessOpen}
-        />
-      )}
-      {isOrderTrackingOpen && (
-        <OrderTracking
-          onClose={handleCloseModals}
-          isActive={isOrderTrackingOpen}
-        />
-      )}
+        <Trust />
+        <WhyD2C />
+        <Contact />
 
-      <LoginModal
-        isActive={isLoginOpen}
-        onClose={handleCloseModals}
-        onShowSignup={handleShowSignupFromLogin}
-      />
+        {/* Modals */}
+        {isCartOpen && (
+          <Cart
+            cart={cart}
+            setCart={handleUpdateCart}
+            updateCartCount={updateCartCount}
+            onShowSection={handleShowSection}
+            isActive={isCartOpen}
+          />
+        )}
+        {isCheckoutOpen && (
+          <Checkout
+            cart={cart}
+            onShowSection={handleShowSection}
+            onClose={handleCloseModals}
+            setCart={handleUpdateCart}
+            onOrderSuccess={() => handleShowSection('order-success')}
+            isActive={isCheckoutOpen}
+          />
+        )}
+        {isOrderSuccessOpen && (
+          <OrderSuccess
+            onShowSection={handleShowSection}
+            isActive={isOrderSuccessOpen}
+          />
+        )}
+        {isOrderTrackingOpen && (
+          <OrderTracking
+            onClose={handleCloseModals}
+            isActive={isOrderTrackingOpen}
+          />
+        )}
 
-      <SignupModal
-        isActive={isSignupOpen}
-        onClose={handleCloseModals}
-        onShowLogin={handleShowLoginFromSignup}
-      />
+        <LoginModal
+          isActive={isLoginOpen}
+          onClose={handleCloseModals}
+          onShowSignup={() => {
+            setIsLoginOpen(false);
+            setIsSignupOpen(true);
+          }}
+        />
+
+        <SignupModal
+          isActive={isSignupOpen}
+          onClose={handleCloseModals}
+          onShowLogin={() => {
+            setIsSignupOpen(false);
+            setIsLoginOpen(true);
+          }}
+        />
+      </Suspense>
     </main>
   );
 } 
